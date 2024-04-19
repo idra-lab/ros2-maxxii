@@ -1,6 +1,6 @@
 /maxxii_node:
   ros__parameters:
-    port: "/dev/ttyUSB0"
+    port: "/dev/ttyS0"
     baud: 115200
     motor_max_rpm: 1500.0
     motor_max_current_amp: 60.0
