@@ -39,7 +39,7 @@ public:
         int rate_enc;
         unsigned long baud;
 
-        this->declare_parameter("port", "/dev/ttyUSB0");
+        this->declare_parameter("port", "/dev/ttyS0");
         this->declare_parameter("baud", 115200);
         this->declare_parameter("motor_max_rpm", 1500.0);
         this->declare_parameter("motor_max_current_amp", 60.0);
