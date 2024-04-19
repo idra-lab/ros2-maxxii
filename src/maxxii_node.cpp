@@ -137,7 +137,8 @@ public:
         try{
             std::string cmd = mdc2460::reqEncodersCount();        
             com_handle_->write(cmd);
-            std::string response = com_handle_->read(BUFFER_SIZE); 
+            std::string response = com_handle_->read(BUFFER_SIZE);
+            std::cout << response << std::endl; 
             if(response.length() == 0)
             {
                 return;
