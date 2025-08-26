@@ -33,7 +33,7 @@ private:
 public:
     MaxxiiRobotNode() : rclcpp::Node("maxxii")
     {
-        double ppr, tau_const;
+        double ppr, vel_alpha, tau_const;
         double max_rpm, max_amp;
         std::string port;
         int rate_enc;
@@ -46,6 +46,7 @@ public:
         this->declare_parameter("pub_rate_enc_Hz", 100);
         this->declare_parameter("pulse_per_revolution", 1024.0);
         this->declare_parameter("torque_constant", 0.01);
+        this->declare_parameter("velocity_alpha", 0.1);
 
         this->get_parameter("port", port);
         this->get_parameter("baud", baud);
@@ -54,12 +55,13 @@ public:
         this->get_parameter("pub_rate_enc_Hz", rate_enc);
         this->get_parameter("pulse_per_revolution", ppr);
         this->get_parameter("torque_constant", tau_const);
+        this->get_parameter("velocity_alpha", vel_alpha);
 
 
         try{
             com_handle_.reset(new serial::Serial(port, baud));
-            encoder_l_.reset(new Encoder(ppr));
-            encoder_r_.reset(new Encoder(ppr));
+            encoder_l_.reset(new Encoder(ppr, vel_alpha));
+            encoder_r_.reset(new Encoder(ppr, vel_alpha));
             motor_l_.reset(new Motor(VELOCITY, tau_const, max_rpm, max_amp));
             motor_r_.reset(new Motor(VELOCITY, tau_const, max_rpm, max_amp));
 
@@ -132,6 +134,14 @@ public:
         return value_norm;
     }
 
+    /*
+    Read the encoders and publish the values of angle in radiants and velocity in rad/s
+    1. Send the command to request the encoders readings
+    2. Read the response from the serial port
+    3. Parse the response to extract the pulse counts for left and right encoders
+    4. Update the encoder objects with the new pulse counts
+    5. Populate a JointState message with the position and velocity data
+    */
     void encCallback() 
     {
         try{
@@ -155,7 +165,9 @@ public:
             msg.position = std::vector<double>{
                 encoder_l_->getRadiants(),
                 encoder_r_->getRadiants()};
-
+            msg.velocity = std::vector<double>{
+                encoder_l_->getVelocity(),
+                encoder_r_->getVelocity()};
             enc_pub_->publish(msg);
         }
         catch(std::exception& e)
