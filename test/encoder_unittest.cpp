@@ -4,7 +4,7 @@
 // Test for Encoder() constructor
 TEST(EncoderTests, Constructor)
 {
-    Encoder encoder(200.0);
+    Encoder encoder(200.0, 0.1);
     EXPECT_EQ(encoder.getPPR(), 200);
 
     EXPECT_ANY_THROW(Encoder encoder(0.0));
@@ -13,7 +13,7 @@ TEST(EncoderTests, Constructor)
 // Test for setReferencePulseCount() method
 TEST(EncoderTests, SetReferencePulseCount) 
 {
-    Encoder encoder(100.0);
+    Encoder encoder(100.0, 0.1);
     encoder.setReferencePulseCount(100);
     EXPECT_EQ(encoder.getPulseCount(), -100);
     encoder.setReferencePulseCount(0.0);
